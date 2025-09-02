@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>학과 정보</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        h1 { text-align: center; }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: center;
+        }
+        thead {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>학과 정보 조회</h1>
+    <button type="button" id="subjectAllListBtn">학과 정보 조회</button>
+    <section>
+        <table>
+            <thead>
+            <tr>
+                <th>번호</th>
+                <th>학과 번호</th>
+                <th>학과명</th>
+            </tr>
+            </thead>
+            <tbody id="subjectList">
+            <tr>
+                <td colspan="3">버튼을 눌러 학과 정보를 조회하세요.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<script>
+    document.getElementById("subjectAllListBtn").addEventListener("click", function() {
+        fetch("/subject/subjectAllList")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('네트워크 응답이 올바르지 않습니다.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            let subjectList = document.getElementById("subjectList");
+            // 기존 내용 비우기
+            subjectList.textContent = "";
+
+            if (data.length === 0) {
+                subjectList.innerHTML = "<tr><td colspan='3'>등록된 학과 정보가 존재하지 않습니다.</td></tr>";
+            } else {
+                data.forEach((subject) => {
+                    const tr = document.createElement("tr");
+
+                    const tdNo = document.createElement("td");
+                    tdNo.textContent = subject.no;
+
+                    const tdNumber = document.createElement("td");
+                    tdNumber.textContent = subject.subjectNumber;
+
+                    const tdName = document.createElement("td");
+                    tdName.textContent = subject.subjectName;
+
+                    tr.appendChild(tdNo);
+                    tr.appendChild(tdNumber);
+                    tr.appendChild(tdName);
+
+                    subjectList.appendChild(tr);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Fetch 에러:', error);
+            document.getElementById("subjectList").innerHTML = "<tr><td colspan='3'>데이터를 불러오는 중 오류가 발생했습니다.</td></tr>";
+        });
+    });
+</script>
+</body>
+</html>

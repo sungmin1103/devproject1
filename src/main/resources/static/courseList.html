@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>수업 정보</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .container { max-width: 800px; margin: auto; }
+        h1 { text-align: center; }
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f0f0f0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ccc;
+            padding: 12px;
+            text-align: center;
+        }
+        thead {
+            background-color: #f2f2f2;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>수업 정보 조회</h1>
+    <button type="button" id="courseAllListBtn">수업 정보 조회</button>
+    <section>
+        <table>
+            <thead>
+            <tr>
+                <th>번호</th>
+                <th>수업 번호</th>
+                <th>수업명</th>
+                <th>수업 학점</th>
+                <th>수업 전공</th>
+            </tr>
+            </thead>
+            <tbody id="courseList">
+            <tr>
+                <td colspan="5">버튼을 눌러 수업 정보를 조회하세요.</td>
+            </tr>
+            </tbody>
+        </table>
+    </section>
+</div>
+
+<script>
+    document.getElementById("courseAllListBtn").addEventListener("click", function() {
+        fetch("/course/courseAllList")
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('네트워크 응답이 올바르지 않습니다.');
+            }
+            return response.json();
+        })
+        .then(data => {
+            let courseList = document.getElementById("courseList");
+            // 기존 내용 비우기
+            courseList.textContent = "";
+
+            if (data.length === 0) {
+                courseList.innerHTML = "<tr><td colspan='5'>등록된 학과 정보가 존재하지 않습니다.</td></tr>";
+            } else {
+                data.forEach((course) => {
+                    const tr = document.createElement("tr");
+
+                    const tdNo = document.createElement("td");
+                    tdNo.textContent = course.no;
+
+                    const tdNum = document.createElement("td");
+                    tdNum.textContent = course.courseNum;
+
+                    const tdName = document.createElement("td");
+                    tdName.textContent = course.courseName;
+
+                    const tdCredit = document.createElement("td");
+                    tdCredit.textContent = course.courseCredit;
+
+                    const tdSection = document.createElement("td");
+                    tdSection.textContent = course.courseSection;
+
+                    tr.appendChild(tdNo);
+                    tr.appendChild(tdNum);
+                    tr.appendChild(tdName);
+                    tr.appendChild(tdCredit);
+                    tr.appendChild(tdSection);
+
+                    courseList.appendChild(tr);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Fetch 에러:', error);
+            document.getElementById("courseList").innerHTML = "<tr><td colspan='5'>데이터를 불러오는 중 오류가 발생했습니다.</td></tr>";
+        });
+    });
+</script>
+</body>
+</html>
